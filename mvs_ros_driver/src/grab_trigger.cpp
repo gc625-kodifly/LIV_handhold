@@ -13,7 +13,7 @@
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <signal.h>
-
+#include <pwd.h>   // add this
 using namespace std;
 
 struct time_stamp {
@@ -306,6 +306,17 @@ int main(int argc, char **argv) {
   pub = it.advertise(pub_topic, 1);
   
   const char *user_name = getlogin();
+    if (!user_name) {                       // fallback #1
+      user_name = getenv("USER");         // works in most shells
+  }
+  if (!user_name) {                       // fallback #2
+      struct passwd *pw = getpwuid(geteuid());
+      if (pw) user_name = pw->pw_name;
+  }
+  if (!user_name) {
+      ROS_FATAL("Cannot determine user name; set $USER or pass a param.");
+      return 1;
+  }
   std::string path_for_time_stamp = "/home/" + std::string(user_name) + "/timeshare";
   const char *shared_file_name = path_for_time_stamp.c_str();
 
