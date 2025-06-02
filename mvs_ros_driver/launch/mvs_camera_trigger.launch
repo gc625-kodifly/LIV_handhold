@@ -15,5 +15,10 @@
     args="-d $(find mvs_ros_driver)/rviz_cfg/mvs_camera.rviz"
   />
       launch-prefix="gdb -ex run --args"
+  <node pkg="image_view"
+        type="image_saver"
+        name="calib_image_saver"
+        output="screen"
 
+        args="image:=/left_camera/image _filename_format:=/home/kodifly/calib/frame%04d.jpg" />
 </launch>
